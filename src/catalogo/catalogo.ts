@@ -1,22 +1,21 @@
-// ===================== GRUPO A · CATÁLOGO =====================
-// Produto: { id, nome, preco, categoria ("cafe" | "acessorios" | "livros"), estoque, tags }
-// MIGRAÇÃO: transforme esse comentário em interface Produto.
+import type { FiltroProdutos, Produto } from "./tipos.ts";
 
 export class Catalogo {
-  constructor(produtos) {
+  produtos: Produto[];
+
+  constructor(produtos: Produto[]) {
     this.produtos = produtos;
   }
 
-  get total() {
+  get total(): number {
     return this.produtos.length;
   }
 
-  buscarPorId(id) {
+  buscarPorId(id: number): Produto | undefined {
     return this.produtos.find((produto) => produto.id === id);
   }
 
-  // filtro: { categoria?, busca?, somenteDisponiveis?, precoMaximo? }
-  filtrar(filtro = {}) {
+  filtrar(filtro: FiltroProdutos = {}): Produto[] {
     const { categoria, busca, somenteDisponiveis, precoMaximo } = filtro;
     const termo = busca?.trim().toLowerCase() ?? "";
     return this.produtos.filter(
@@ -28,11 +27,11 @@ export class Catalogo {
     );
   }
 
-  ordenarPor(chave, lista = [...this.produtos]) {
+  ordenarPor(chave: keyof Produto, lista: Produto[] = [...this.produtos]): Produto[] {
     return lista.toSorted((a, b) => (a[chave] < b[chave] ? -1 : a[chave] > b[chave] ? 1 : 0));
   }
 
-  faixaDePreco() {
+  faixaDePreco(): [number, number] {
     const precos = this.produtos.map((produto) => produto.preco);
     return [Math.min(...precos), Math.max(...precos)];
   }

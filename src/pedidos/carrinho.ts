@@ -1,19 +1,28 @@
 import { calcularFrete } from "../legado/frete-legado.js";
+import type { Produto } from "../catalogo/tipos.ts";
+import type { Cupom, ItemCarrinho } from "./tipos.ts";
 
-// Cupom (vem de public/dados/cupons.json), um dos três formatos:
-//   { codigo, tipo: "percentual", percentual }
-//   { codigo, tipo: "valorFixo", valor, minimo }
-//   { codigo, tipo: "freteGratis" }
-// MIGRAÇÃO: união discriminada + exaustividade com never.
+interface ResumoCarrinho {
+  subtotal: number;
+  desconto: number;
+  frete: number;
+  total: number;
+  quantidadeItens: number;
+  cupomAplicado: string | null;
+}
 
 export class Carrinho {
-  constructor(ufDestino) {
+  ufDestino: string;
+  itens: ItemCarrinho[];
+  cupom: Cupom | null;
+
+  constructor(ufDestino: string) {
     this.ufDestino = ufDestino;
     this.itens = [];
     this.cupom = null;
   }
 
-  adicionar(quantidade, ...produtos) {
+  adicionar(quantidade: number, ...produtos: Produto[]): void {
     for (const produto of produtos) {
       if (quantidade <= 0 || produto.estoque < quantidade) continue;
       const existente = this.itens.find((item) => item.produtoId === produto.id);
@@ -25,19 +34,19 @@ export class Carrinho {
     }
   }
 
-  remover(produtoId) {
+  remover(produtoId: number): void {
     this.itens = this.itens.filter((item) => item.produtoId !== produtoId);
   }
 
-  aplicarCupom(cupom) {
+  aplicarCupom(cupom: Cupom | null): void {
     this.cupom = cupom;
   }
 
-  listar() {
+  listar(): ItemCarrinho[] {
     return this.itens;
   }
 
-  resumo() {
+  resumo(): ResumoCarrinho {
     const subtotal = this.itens.reduce((soma, item) => soma + item.produto.preco * item.quantidade, 0);
     const quantidadeItens = this.itens.reduce((soma, item) => soma + item.quantidade, 0);
     const freteBase = quantidadeItens === 0 ? 0 : calcularFrete(this.ufDestino, quantidadeItens);
@@ -52,17 +61,19 @@ export class Carrinho {
     };
   }
 
-  aplicar(cupom, subtotal, frete) {
+  aplicar(cupom: Cupom | null, subtotal: number, frete: number): { desconto: number; frete: number } {
     if (cupom === null) return { desconto: 0, frete };
     switch (cupom.tipo) {
       case "percentual":
         return { desconto: (subtotal * cupom.percentual) / 100, frete };
-      case "valorfixo":
+      case "valorFixo":
         return { desconto: subtotal >= cupom.minimo ? cupom.valor : 0, frete };
       case "freteGratis":
         return { desconto: 0, frete: 0 };
-      default:
-        return { desconto: 0, frete };
+      default: {
+        const _exaustivo: never = cupom;
+        return _exaustivo;
+      }
     }
   }
 }

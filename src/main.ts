@@ -1,13 +1,15 @@
 import "./style.css";
-import { Catalogo } from "./catalogo/catalogo.js";
-import { buscarLista } from "./compartilhado/api.js";
-import { formatarMoeda } from "./compartilhado/moeda.js";
-import { Carrinho } from "./pedidos/carrinho.js";
-import { proximoStatus, rotuloStatus } from "./pedidos/status.js";
+import { Catalogo } from "./catalogo/catalogo.ts";
+import type { CategoriaInfo, Produto } from "./catalogo/tipos.ts";
+import { buscarLista } from "./compartilhado/api.ts";
+import { formatarMoeda } from "./compartilhado/moeda.ts";
 import { diasDesde, formatarData } from "./legado/datas.js";
+import { Carrinho } from "./pedidos/carrinho.ts";
+import { proximoStatus, rotuloStatus } from "./pedidos/status.ts";
+import type { Cupom, Pedido } from "./pedidos/tipos.ts";
 
-function elemento(seletor) {
-  const achado = document.querySelector(seletor);
+function elemento<T extends Element = HTMLElement>(seletor: string): T {
+  const achado = document.querySelector<T>(seletor);
   if (!achado) throw new Error(`Elemento ${seletor} não existe no HTML`);
   return achado;
 }
@@ -36,33 +38,65 @@ app.innerHTML = `
   </main>
   <p id="erro" class="erro" hidden></p>`;
 
-function mostrarErro(mensagem) {
+function mostrarErro(mensagem: string): void {
   const caixa = elemento("#erro");
   caixa.textContent = `⚠️ ${mensagem}`;
   caixa.hidden = false;
 }
 
+function ehArrayDe<T>(valor: unknown, ehItem: (item: unknown) => item is T): valor is T[] {
+  return Array.isArray(valor) && valor.every(ehItem);
+}
+
+function ehProduto(valor: unknown): valor is Produto {
+  if (typeof valor !== "object" || valor === null) return false;
+  const p = valor as Record<string, unknown>;
+  return typeof p.id === "number" && typeof p.nome === "string" && typeof p.preco === "number" && typeof p.estoque === "number";
+}
+
+function ehCategoriaInfo(valor: unknown): valor is CategoriaInfo {
+  if (typeof valor !== "object" || valor === null) return false;
+  const c = valor as Record<string, unknown>;
+  return typeof c.id === "string" && typeof c.nome === "string";
+}
+
+function ehCupom(valor: unknown): valor is Cupom {
+  if (typeof valor !== "object" || valor === null) return false;
+  const c = valor as Record<string, unknown>;
+  return typeof c.codigo === "string" && typeof c.tipo === "string";
+}
+
+function ehPedido(valor: unknown): valor is Pedido {
+  if (typeof valor !== "object" || valor === null) return false;
+  const p = valor as Record<string, unknown>;
+  return typeof p.id === "string" && typeof p.cliente === "string" && typeof p.status === "string" && Array.isArray(p.itens);
+}
+
+function mensagemDeErro(erro: unknown): string {
+  return erro instanceof Error ? erro.message : "Erro desconhecido";
+}
+
 async function iniciar() {
   // As 4 buscas em paralelo (http://localhost:5173/dados/...)
-  let produtos, categorias, cupons, pedidos;
+  let produtos: Produto[], categorias: CategoriaInfo[], cupons: Cupom[], pedidos: Pedido[];
   try {
     [produtos, categorias, cupons, pedidos] = await Promise.all([
-      buscarLista("produtos.json"),
-      buscarLista("categorias.json"),
-      buscarLista("cupons.json"),
-      buscarLista("pedidos.json"),
+      buscarLista("produtos.json", (v): v is Produto[] => ehArrayDe(v, ehProduto)),
+      buscarLista("categorias.json", (v): v is CategoriaInfo[] => ehArrayDe(v, ehCategoriaInfo)),
+      buscarLista("cupons.json", (v): v is Cupom[] => ehArrayDe(v, ehCupom)),
+      buscarLista("pedidos.json", (v): v is Pedido[] => ehArrayDe(v, ehPedido)),
     ]);
-  } catch (erro) {
-    return mostrarErro(erro.message);
+  } catch (erro: unknown) {
+    return mostrarErro(mensagemDeErro(erro));
   }
 
   const catalogo = new Catalogo(produtos);
   const carrinho = new Carrinho(import.meta.env.VITE_UF_ENTREGA);
 
-  const selCategoria = elemento("#categoria");
-  const campoBusca = elemento("#busca");
-  const chkDisponiveis = elemento("#disponiveis");
-  const selCupom = elemento("#cupom");
+  const selCategoria = elemento<HTMLSelectElement>("#categoria");
+  const campoBusca = elemento<HTMLInputElement>("#busca");
+  const chkDisponiveis = elemento<HTMLInputElement>("#disponiveis");
+  const selCupom = elemento<HTMLSelectElement>("#cupom");
 
   for (const categoria of categorias) selCategoria.add(new Option(categoria.nome, categoria.id));
   for (const cupom of cupons) selCupom.add(new Option(cupom.codigo, cupom.codigo));
@@ -107,7 +141,8 @@ async function iniciar() {
   for (const campo of [selCategoria, campoBusca, chkDisponiveis]) campo.addEventListener("input", desenharCatalogo);
   elemento("#produtos").addEventListener("click", (evento) => {
     const alvo = evento.target;
-    const produto = catalogo.buscarPorId(alvo.dataset.id);
+    if (!(alvo instanceof HTMLElement)) return;
+    const produto = catalogo.buscarPorId(Number(alvo.dataset.id));
     if (produto) {
       carrinho.adicionar(1, produto);
       desenharCarrinho();
@@ -115,6 +150,7 @@ async function iniciar() {
   });
   elemento("#itens").addEventListener("click", (evento) => {
     const alvo = evento.target;
+    if (!(alvo instanceof HTMLElement)) return;
     if (alvo.dataset.remover) {
       carrinho.remover(Number(alvo.dataset.remover));
       desenharCarrinho();

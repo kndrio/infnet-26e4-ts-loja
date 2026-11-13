@@ -33,7 +33,7 @@
     // allowJs: .js e .ts convivem. checkJs fica desligado:
     // cada .js liga a checagem sozinho com // @ts-check.
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
 
     // ---- Tipos de pacotes [Etapa 7.1] --------------------------------
     // Carrega só estes pacotes de tipos globais (import.meta.env, imports de .css...).
