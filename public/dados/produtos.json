@@ -1,0 +1,9 @@
+[
+  { "id": 1, "nome": "Café especial 250g", "preco": 42.9, "categoria": "cafe", "estoque": 12, "tags": ["torra média", "arábica"] },
+  { "id": 2, "nome": "Café em cápsulas (10 un.)", "preco": 24.5, "categoria": "cafe", "estoque": 0, "tags": ["cápsula"] },
+  { "id": 3, "nome": "Moedor manual", "preco": 189.0, "categoria": "acessorios", "estoque": 4, "tags": ["inox"] },
+  { "id": 4, "nome": "Prensa francesa 600ml", "preco": 119.9, "categoria": "acessorios", "estoque": 7, "tags": [] },
+  { "id": 5, "nome": "Caneca térmica", "preco": 79.9, "categoria": "acessorios", "estoque": 20, "tags": ["presente"] },
+  { "id": 6, "nome": "Livro: A ciência do café", "preco": 64.0, "categoria": "livros", "estoque": 3, "tags": ["presente"] },
+  { "id": 7, "nome": "Café descafeinado 250g", "preco": 46.0, "categoria": "cafe", "estoque": 5, "tags": ["descafeinado"] }
+]

@@ -1,0 +1,5 @@
+[
+  { "id": "cafe", "nome": "Café" },
+  { "id": "acessorios", "nome": "Acessórios" },
+  { "id": "livros", "nome": "Livros" }
+]

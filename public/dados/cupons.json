@@ -1,0 +1,5 @@
+[
+  { "codigo": "BEMVINDO10", "tipo": "percentual", "percentual": 10 },
+  { "codigo": "MENOS20", "tipo": "valorFixo", "valor": 20, "minimo": 100 },
+  { "codigo": "FRETEGRATIS", "tipo": "freteGratis" }
+]

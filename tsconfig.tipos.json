@@ -1,0 +1,13 @@
+{
+  // [Etapa 7.2] Gera os .d.ts da API pública do módulo (para publicar/compartilhar tipos).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,       // "ir para definição" leva ao .ts original
+    "rootDir": "src",            // TS 7 exige dizer a pasta raiz das fontes
+    "outDir": "dist/tipos"
+  },
+  "include": ["src/catalogo", "src/pedidos", "src/compartilhado"]
+}

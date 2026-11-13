@@ -1,0 +1,47 @@
+{
+  // [Etapa 7.3] Base: template oficial do Vite (vanilla-ts), com comentários.
+  "compilerOptions": {
+    // ---- Rigor -------------------------------------------------------
+    // No TypeScript 7 o strict já vem ligado por padrão; deixamos explícito.
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // Leitura de índice devolve T | undefined (mais seguro com dados de API).
+    "noUncheckedIndexedAccess": true,
+
+    // ---- Alvo e bibliotecas [Etapa 8.4] ------------------------------
+    // target: até que versão do JS o código pode ir.
+    // lib: quais APIs existem (ES2023 + navegador). Object.groupBy precisa de ES2024.
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+
+    // ---- Módulos (modo bundler: quem empacota é o Vite) --------------
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    // Obriga "import type" para tipos: o import some no JS gerado.
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+
+    // ---- Só sintaxe "apagável" [Etapa 8.6] ---------------------------
+    // Proíbe enum, namespace e parameter properties (TS1294):
+    // são as únicas partes do TS que GERAM código JS.
+    "erasableSyntaxOnly": true,
+
+    // ---- Migração gradual [Etapa 8.5] --------------------------------
+    // allowJs: .js e .ts convivem. checkJs fica desligado:
+    // cada .js liga a checagem sozinho com // @ts-check.
+    "allowJs": true,
+    "checkJs": true,
+
+    // ---- Tipos de pacotes [Etapa 7.1] --------------------------------
+    // Carrega só estes pacotes de tipos globais (import.meta.env, imports de .css...).
+    "types": ["vite/client"],
+
+    // ---- Desempenho e saída ------------------------------------------
+    "skipLibCheck": true,   // não re-checa os .d.ts de node_modules
+    "noEmit": true           // o tsc só verifica; quem gera o JS é o Vite
+  },
+  "include": ["src"]
+}

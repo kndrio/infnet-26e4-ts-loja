@@ -1,0 +1,5 @@
+[
+  { "id": "P-1001", "cliente": "Letícia", "status": "entregue", "itens": [{ "produtoId": 1, "quantidade": 2 }], "criadoEm": "2026-11-02T14:30:00Z" },
+  { "id": "P-1002", "cliente": "Breno", "status": "enviado", "itens": [{ "produtoId": 3, "quantidade": 1 }, { "produtoId": 5, "quantidade": 1 }], "criadoEm": "2026-11-09T10:05:00Z" },
+  { "id": "P-1003", "cliente": "Armstrong", "status": "pago", "itens": [{ "produtoId": 6, "quantidade": 1 }], "criadoEm": "2026-11-11T19:40:00Z" }
+]
